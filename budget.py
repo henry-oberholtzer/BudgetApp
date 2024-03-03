@@ -54,4 +54,37 @@ class Category:
 
 
 def create_spend_chart(categories):
-  pass
+  spend_chart = "Percentage spent by category\n"
+  total = sum(category.get_balance() for category in categories)
+  print(total)
+  percentage_strs = {
+    100: '100|',
+    90: ' 90|',
+    80: ' 80|',
+    70: ' 70|',
+    60: ' 60|',
+    50: ' 50|',
+    40: ' 40|',
+    30: ' 30|',
+    20: ' 20|',
+    10: ' 10|',
+    0:  '  0|'}
+  for category in categories:
+    print(category.get_balance())
+    percent = round((category.get_balance() / total) * 100)
+    print(percent)
+    for percent_str in percentage_strs:
+      if percent_str == 0:
+        percentage_strs[percent_str] += ' o '
+      elif percent >= percent_str:
+        percentage_strs[percent_str] += ' o '
+      else:
+        percentage_strs[percent_str] += '   '
+  # get percentages
+  spend_chart += ' \n'.join(percentage for percentage in percentage_strs.values()) + ' \n'
+  # add dashes
+  spend_chart += f'    {'---'*len(categories)}-'
+  # add labels
+  name_list = list(cat.name for cat in categories)
+  print(name_list)
+  return spend_chart
