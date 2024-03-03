@@ -29,10 +29,13 @@ class Category:
     return self._withdraw(amount, description)
   
   def _get_balance(self):
-    balance = 0
-    for entry in self.ledger:
-      balance += entry["amount"]
-    return balance
+    return sum([entry["amount"] for entry in self.ledger])
+  
+  def _get_expenses(self):
+    return sum([entry["amount"] for entry in self.ledger if entry["amount"] < 0])
+  
+  def get_expenses(self):
+    return self._get_expenses()
 
   def get_balance(self):
     return self._get_balance()
@@ -55,8 +58,8 @@ class Category:
 
 def create_spend_chart(categories):
   spend_chart = "Percentage spent by category\n"
-  total = sum(category.get_balance() for category in categories)
-  print(total)
+  total_spent = sum([category.get_expenses() for category in categories])
+  print(total_spent)
   percentage_strs = {
     100: '100|',
     90: ' 90|',
@@ -70,9 +73,8 @@ def create_spend_chart(categories):
     10: ' 10|',
     0:  '  0|'}
   for category in categories:
-    print(category.get_balance())
-    percent = round((category.get_balance() / total) * 100)
-    print(percent)
+    percent = round((category.get_expenses() / total_spent) * 100)
+    print(category.get_expenses())
     for percent_str in percentage_strs:
       if percent_str == 0:
         percentage_strs[percent_str] += ' o '
@@ -83,8 +85,16 @@ def create_spend_chart(categories):
   # get percentages
   spend_chart += ' \n'.join(percentage for percentage in percentage_strs.values()) + ' \n'
   # add dashes
-  spend_chart += f'    {'---'*len(categories)}-'
+  spend_chart += f'    {'---'*len(categories)}-\n'
   # add labels
   name_list = list(cat.name for cat in categories)
-  print(name_list)
-  return spend_chart
+  name_iterations = len(max(name_list, key = len))
+  for char_index in range(name_iterations):
+    spend_chart += '    '
+    for name in name_list:
+      if char_index < len(name):
+        spend_chart += f' {name[char_index]} '
+      else:
+        spend_chart += '   '
+    spend_chart += ' \n'
+  return spend_chart.strip('\n')
