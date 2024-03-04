@@ -6,7 +6,8 @@ class Category:
   def __str__(self) -> str:
     to_string = '{:*^30}\n'.format(self.name)
     for entry in self.ledger:
-      amount_str = f' {format(entry["amount"], '.2f')}'
+      amount = entry["amount"]
+      amount_str = f" {amount:.2f}"
       desc_str = '{:<30}'.format(entry["description"])
       trim_index = 30 - len(amount_str)
       to_string += f'{desc_str[:trim_index]}{amount_str}\n'
@@ -59,7 +60,6 @@ class Category:
 def create_spend_chart(categories):
   spend_chart = "Percentage spent by category\n"
   total_spent = sum([category.get_expenses() for category in categories])
-  print(total_spent)
   percentage_strs = {
     100: '100|',
     90: ' 90|',
@@ -74,7 +74,6 @@ def create_spend_chart(categories):
     0:  '  0|'}
   for category in categories:
     percent = round((category.get_expenses() / total_spent) * 100)
-    print(category.get_expenses())
     for percent_str in percentage_strs:
       if percent_str == 0:
         percentage_strs[percent_str] += ' o '
@@ -85,7 +84,7 @@ def create_spend_chart(categories):
   # get percentages
   spend_chart += ' \n'.join(percentage for percentage in percentage_strs.values()) + ' \n'
   # add dashes
-  spend_chart += f'    {'---'*len(categories)}-\n'
+  spend_chart += '    ' + '---'*len(categories) + '-\n'
   # add labels
   name_list = list(cat.name for cat in categories)
   name_iterations = len(max(name_list, key = len))
